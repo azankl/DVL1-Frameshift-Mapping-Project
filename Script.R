@@ -54,7 +54,7 @@ del1593_seq <- replaceAt(
     value = DNAStringSet("")
 )
 del1593_NM_001330311_protein_seq <- translate(del1593_seq)
-subseq(
+del1593_new_protein_seq <- subseq(
     del1593_NM_001330311_protein_seq,
     start = 532,
     end = start(matchPattern("*", del1593_NM_001330311_protein_seq))[1] - 1 # the [1] is needed because matchPattern returns a list of matches, and we want the first one, the -1 is needed to get the position of the last amino acid before the stop codon
@@ -67,18 +67,36 @@ del1508_seq <- replaceAt(
     value = DNAStringSet("")
 )
 del1508_NM_004421_protein_seq <- translate(del1508_seq)
-subseq(
+del1508_new_protein_seq <- subseq(
     del1508_NM_004421_protein_seq,
     start = 503,
     end = start(matchPattern("*", del1508_NM_004421_protein_seq))[1] - 1
 )
-library(pwalign)
+# library(pwalign)
 
 # create a pairwise alignment of the two protein sequences
-aln <- pairwiseAlignment(
-    del1593_NM_001330311_protein_seq,
-    del1508_NM_004421_protein_seq,
-    substitutionMatrix = "BLOSUM62",
-    type = "global"
+# aln <- pairwiseAlignment(
+#     del1593_NM_001330311_protein_seq,
+#     del1508_NM_004421_protein_seq,
+#     substitutionMatrix = "BLOSUM62",
+#     type = "global"
+# )
+# aln
+
+# create a multiple sequence alignment of the two protein sequences
+library(msa)
+aln <- msa(
+    AAStringSet(c(
+        as.character(del1593_new_protein_seq),
+        as.character(del1508_new_protein_seq)
+    )),
+    method = "ClustalW"
 )
 aln
+msaPrettyPrint(
+    aln,
+    output = "pdf",
+    shadingMode = "identical",
+    shadingColors = "blues",
+    showNames = "none"
+)
