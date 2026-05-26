@@ -14,6 +14,7 @@
 
 library(Biostrings)
 library(rentrez)
+library(msa)
 
 # Fetch the sequences
 NM_001330311_CDS_record <- entrez_fetch(
@@ -57,7 +58,9 @@ del1593_NM_001330311_protein_seq <- translate(del1593_seq)
 del1593_new_protein_seq <- subseq(
     del1593_NM_001330311_protein_seq,
     start = 532,
-    end = start(matchPattern("*", del1593_NM_001330311_protein_seq))[1] - 1 # the [1] is needed because matchPattern returns a list of matches, and we want the first one, the -1 is needed to get the position of the last amino acid before the stop codon
+    end = start(matchPattern("*", del1593_NM_001330311_protein_seq))[1] - 1
+    # the [1] is needed because matchPattern returns a list of matches, and we want the first one
+    # # the -1 is needed to get the position of the last amino acid before the stop codon
 )
 
 # Introduce a 1 bp deletion at position 1508 (1-based index) in NM_004421
@@ -85,22 +88,29 @@ del1508_new_protein_seq <- subseq(
 # aln
 
 # create a multiple sequence alignment of the two protein sequences using the msa package
-library(msa)
 aln <- msa(
     AAStringSet(c(
-        as.character(del1593_new_protein_seq),
-        as.character(del1508_new_protein_seq)
+        "NM_001330311_del1593" = as.character(del1593_new_protein_seq),
+        "NM_004421_del1508" = as.character(del1508_new_protein_seq)
     )),
     method = "ClustalW"
 )
 aln
-msaPrettyPrint(
-    aln,
-    output = "pdf",
-    shadingMode = "identical",
-    shadingColors = "blues",
-    showNames = "none"
-)
+# print the alignment as an AAStringSet object, looks prettier
+aln_set <- as(aln, "AAStringSet")
+aln_set
+
+# print the first 10 amino acids of the alignment
+narrow(aln_set, start = 1, end = 10)
+# narrow is similar to subseq, see AAStringSet documentation
+
+# this msa function creates a pretty alignment with many options,
+# but the output is a pdf file
+# allows to show per-sequence position counters, which just printing the AAStringSet does not do
+#     shadingMode = "identical",
+#     shadingColors = "blues",
+#     showNames = "none"
+# )
 
 # create a multiple sequence alignment of the two protein sequences using the ggmsa package
 # works, but the plot opens in the plot window, not the console, so not much better than msaPrettyPrint
