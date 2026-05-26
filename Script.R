@@ -75,6 +75,7 @@ del1508_new_protein_seq <- subseq(
 # library(pwalign)
 
 # create a pairwise alignment of the two protein sequences
+# works, but does not look very pretty, use msa instead, see below
 # aln <- pairwiseAlignment(
 #     del1593_NM_001330311_protein_seq,
 #     del1508_NM_004421_protein_seq,
@@ -83,7 +84,7 @@ del1508_new_protein_seq <- subseq(
 # )
 # aln
 
-# create a multiple sequence alignment of the two protein sequences
+# create a multiple sequence alignment of the two protein sequences using the msa package
 library(msa)
 aln <- msa(
     AAStringSet(c(
@@ -100,3 +101,11 @@ msaPrettyPrint(
     shadingColors = "blues",
     showNames = "none"
 )
+
+# create a multiple sequence alignment of the two protein sequences using the ggmsa package
+# works, but the plot opens in the plot window, not the console, so not much better than msaPrettyPrint
+# library(ggmsa)
+# aln_gg <- ggmsa(
+#     as(aln, "AAStringSet")
+# )
+# aln_gg
